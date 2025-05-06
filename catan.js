@@ -13,7 +13,7 @@ var mapStyle = "retro";
 var size = null;
 var defaultFillStyle = "#ffffff";
 var strokeStyle = "#000000";
-var lineWidth = 3;
+var lineWidth = 0;
 var resourceTypeToColor = {
 	"ore": "#363636",
 	"clay": "#E83200",
@@ -55,6 +55,18 @@ var dy = size * Math.sin(Math.PI/3);
 // ----- Map definition globals -----
 
 var catanMap = new CatanMap();
+catanMap.numberOccurency = {
+	2: ".",
+	3: "..",
+	4: "...",
+	5: "....",
+	6: ".....",
+	8: ".....",
+	9: "....",
+	10: "...",
+	11: "..",
+	12: "."
+};
 
 var normalMap = new MapDefinition();
 normalMap.resourceDict = {
@@ -76,7 +88,7 @@ normalMap.numberDict = {
 	10: 2,
 	11: 2,
 	12: 1
-}
+};
 normalMap.coordinatesArray = [
 	[-4,2],[-4,0],[-4,-2],
 	[-2,3],[-2,1],[-2,-1],[-2,-3],
@@ -461,35 +473,6 @@ HexTile.prototype.draw = function() {
 HexTile.prototype.drawBase = function() {
 	
 	if (mapStyle == "retro") {
-		drawingContext.lineWidth = 10;
-		drawingContext.fillStyle = "rgba(255,255,255,0)";
-		drawingContext.strokeStyle = "#FAEB96";
-	} else {
-		drawingContext.lineWidth = this.lineWidth;
-		drawingContext.fillStyle = this.fillStyle;
-		drawingContext.strokeStyle = this.strokeStyle;
-	}
-	
-	var angleOffset = Math.PI / 6;
-	
-	// Begin Path and start at top of hexagon
-	drawingContext.beginPath();
-	drawingContext.moveTo (
-		this.xCenter + size * Math.sin(angleOffset),
-		this.yCenter - size * Math.cos(angleOffset)
-	);
-	// Move clockwise and draw hexagon
-	var newAngle;
-	for (var i = 1; i <= 6; i += 1) {
-		newAngle = i * Math.PI / 3;
-		drawingContext.lineTo (
-			this.xCenter + size * Math.sin(newAngle + angleOffset),
-			this.yCenter - size * Math.cos(newAngle + angleOffset)
-		);
-	}
-	drawingContext.closePath();
-	
-	if (mapStyle == "retro") {
 		
 		var imgCanvas = resourceTypeToImageCanvas[this.resourceType];
 		
@@ -513,7 +496,7 @@ HexTile.prototype.drawNumber = function() {
 	
 	drawingContext.fillStyle = "#FFFFFF";
 	drawingContext.strokeStyle = "#000000";
-	drawingContext.lineWidth = 3;
+	drawingContext.lineWidth = 1;
 	
 	drawingContext.beginPath();
 	drawingContext.arc(this.xCenter, this.yCenter, 0.375 * size,
@@ -523,19 +506,24 @@ HexTile.prototype.drawNumber = function() {
 	drawingContext.fill();
 	drawingContext.stroke();
 	
-	var fontSizePt = Math.ceil(30/40*(.45*size-8)+6);
+	var fontSizePt = Math.ceil(30/40*(.45*size-8)+5);
 	
 	drawingContext.font = "bold " + fontSizePt + "pt sans-serif";
 	drawingContext.textAlign = "center";
 	if ( this.isHighlyProductive() ) {
-		drawingContext.fillStyle = "#FF0000";
+		drawingContext.fillStyle = "#000000";
 	} else {
 		drawingContext.fillStyle = "#000000";
 	}
 	drawingContext.fillText(
 		this.number.toString(),
 		this.xCenter,
-		this.yCenter + Math.ceil( 0.85 * fontSizePt/2 )
+		this.yCenter + Math.ceil( 0.85 * fontSizePt/2 ) - 6
+	);
+	drawingContext.fillText(
+		catanMap.numberOccurency[this.number],
+		this.xCenter,
+		this.yCenter + Math.ceil( 0.85 * fontSizePt/2 ) + 4
 	);
 	
 }
